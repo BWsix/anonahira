@@ -7,5 +7,5 @@
 3. Run the following command to test if the bot is working.
 
 ```bash
-docker run --env-file PATH_TO_ENV_FILE -it --rm bwsix/anonahira:0.1.1
+docker run --env-file PATH_TO_ENV_FILE -it --rm bwsix/anonahira:0.1.2
 ```

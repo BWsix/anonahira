@@ -1,4 +1,5 @@
 import app.config
+import typing
 import asyncio
 import interactions
 
@@ -7,25 +8,25 @@ config = app.config.Config()
 
 @interactions.listen()
 async def on_startup(event: interactions.api.events.Startup):
-    bot_name = event.bot.user.username
-    print(f"Bot: {bot_name}")
+    bot = typing.cast(interactions.Client, event.bot)
+    print(f"Bot: {bot.user.username}")
 
-    guild = await event.bot.fetch_guild(config.guild_id)
+    guild = await bot.fetch_guild(config.guild_id)
     assert guild
+    config.guild = guild
     print(f"Server: {guild.name}")
 
-    assert guild.get_channel(config.channels["#upload-request"])
-    print("Found #upload-request")
-    assert guild.get_channel(config.channels["#upload-sharing"])
-    print("Found #upload-sharing")
-    assert guild.get_channel(config.channels["#misc-sharing"])
-    print("Found #misc-sharing")
-    assert guild.get_channel(config.channels["#upload-request"])
-    print("Found #upload-request")
+    for channel_name, channel_id in config.channel_ids.items():
+        print(f"Searching for {channel_name}")
+        channel = guild.get_channel(channel_id)
+        assert isinstance(channel, interactions.GuildText)
+        config.set_channel(channel_name, channel)
+        print(f"...Found {channel_name}.")
 
+    print("Searching for :pingme:")
     emojis = await guild.fetch_all_custom_emojis()
     assert "pingme" in [emoji.name for emoji in emojis]
-    print("Found :pingme:")
+    print("...Found :pingme:")
 
 
 @interactions.listen()
